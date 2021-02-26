@@ -25,7 +25,9 @@ async function run(): Promise<void> {
     const PR_NUMBER = github.context.payload.pull_request?.number
 
     if (!PR_NUMBER) {
-      core.setFailed('No pull request number was found')
+      core.setFailed(
+        'No pull request number was found. This action can only be run on pull_requests.'
+      )
       return
     }
 
@@ -54,7 +56,7 @@ async function run(): Promise<void> {
     const deployment = deployments.data.length > 0 && deployments.data[0]
 
     if (!deployment) {
-      core.setFailed('No deployment was available')
+      core.setFailed('No deployment was available.')
       return
     }
 
@@ -70,7 +72,7 @@ async function run(): Promise<void> {
     )
 
     if (!status) {
-      core.setFailed('No deployment status was available')
+      core.setFailed('No deployment status was available.')
       return
     }
 
@@ -78,10 +80,11 @@ async function run(): Promise<void> {
     const targetUrl = status.target_url
 
     // Set output
-    core.info(`deployment url available, setting output to ${targetUrl}`)
+    core.info(`Succesful deployment available at: ${targetUrl}`)
     core.setOutput('url', targetUrl)
 
     // Wait for url to respond with a success
+    core.info('Performing healthcheck of deployment')
     await waitForUrl(targetUrl, MAX_TIMEOUT)
   } catch (error) {
     core.setFailed(error.message)

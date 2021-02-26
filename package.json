@@ -2,7 +2,7 @@
   "name": "wait-for-vercel-preview",
   "version": "1.1.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "An action for waiting and checking after a available deployment from vercel",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",

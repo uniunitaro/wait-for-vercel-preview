@@ -21,10 +21,10 @@ const waitForDeploymentStatus = async (
   // Init a new octokit client
   const octokit = github.getOctokit(token)
   // Set the number of tries we are going to check for a deployment status
-  const iterations = MAX_TIMEOUT / 2
+  const MAX_ITERATIONS = MAX_TIMEOUT / 2
 
   // Loop through the iterations
-  for (let i = 0; i < iterations; i++) {
+  for (let i = 0; i < MAX_ITERATIONS; i++) {
     try {
       // Fetch statuses for a specific deployment
       const statuses = await octokit.repos.listDeploymentStatuses({
@@ -38,27 +38,36 @@ const waitForDeploymentStatus = async (
 
       // Handle the different type of scenarios, throwing a status leads to a new attempt
       if (!status) {
-        throw new StatusError('No status was available for latest deployment')
+        throw new StatusError(
+          `Found no status for current deployment, checking again in two seconds… (${i}/${MAX_ITERATIONS})`
+        )
       } else if (
         status &&
         ALLOW_INACTIVE === true &&
         status.state === 'inactive'
       ) {
+        core.info(
+          'An inactive deployment was found and ALLOW_INACTIVE is set to "true", continuing…'
+        )
         return status
       } else if (status && status.state === 'pending') {
-        throw new StatusError('A deployment is pending')
-      } else if (status && status.state === 'queued') {
-        throw new StatusError('A deployment is queued')
-      } else if (status && status.state === 'in_progress') {
-        throw new StatusError('A deployment is in progress')
-      } else if (status && status.state === 'error') {
         throw new StatusError(
-          'The latest deployment received a status with an error'
+          `Found a deployment with status "pending", checking again in two seconds… (${i}/${MAX_ITERATIONS})`
         )
+      } else if (status && status.state === 'queued') {
+        throw new StatusError(
+          `Found a deployment with status "queued", checking again in two seconds… (${i}/${MAX_ITERATIONS})`
+        )
+      } else if (status && status.state === 'in_progress') {
+        throw new StatusError(
+          `Found a deployment with status "in_progress", checking again in two seconds… (${i}/${MAX_ITERATIONS})`
+        )
+      } else if (status && status.state === 'error') {
+        core.setFailed('The deployment failed with an error, aborting…')
       } else if (status && status.state === 'failure') {
-        core.setFailed('The latest deployment failed, aborting…')
+        core.setFailed('The deployment failed, aborting…')
       } else if (status && status.state === 'success') {
-        core.info('Found a successful deployment')
+        core.info('A successful deployment was found, continuing…')
         return status
       } else {
         throw new StatusError('Unknown status error')

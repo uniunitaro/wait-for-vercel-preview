@@ -6,11 +6,13 @@ const waitForUrl = async (url: string, MAX_TIMEOUT: number): Promise<void> => {
   const iterations = MAX_TIMEOUT / 2
   for (let i = 0; i < iterations; i++) {
     try {
-      core.info('Trying to access the deployment url')
       await axios.get(url)
+      core.info('Deployment is available, finishing…')
       return
     } catch (e) {
-      core.info('Unable to access the provided deployment url, trying again.')
+      core.info(
+        `Unable to access the provided deployment, trying again in 2 seconds. iteration: ${i}/${iterations}`
+      )
       await wait(2000)
     }
   }
