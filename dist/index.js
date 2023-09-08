@@ -224,25 +224,33 @@ const waitForDeploymentToStart = async ({
         environment,
       });
 
+      console.log(JSON.stringify(deployments))
       const deployment =
-        deployments.data.length > 0 &&
-        deployments.data.find((deployment) => {
-          return deployment.creator.login === actorName;
-        });
+        deployments.data.length > 0 && deployments.data[0]
+        // deployments.data.find((deployment) => {
+        //   return deployment.creator.login === actorName;
+        // });
 
       if (deployment) {
         return deployment;
       }
 
-      throw new Error(`no ${actorName} deployment found`);
-    } catch (e) {
       console.log(
-        `Could not find any deployments for actor ${actorName}, retrying (attempt ${
+        `OOPS! Could not find any deployments for actor ${actorName}, retrying (attempt ${
           i + 1
         } / ${iterations})`
       );
-      await wait(checkIntervalInMilliseconds);
+    } catch(e) {
+      console.log(
+        `Error while fetching deployments, retrying (attempt ${
+          i + 1
+        } / ${iterations})`
+      );
+
+      console.error(e)
     }
+
+    await wait(checkIntervalInMilliseconds);
   }
 
   return null;
@@ -326,7 +334,7 @@ const run = async () => {
       sha: sha,
       environment: ENVIRONMENT,
       actorName: 'vercel[bot]',
-      maxTimeout: MAX_TIMEOUT / 2,
+      maxTimeout: MAX_TIMEOUT,
       checkIntervalInMilliseconds: CHECK_INTERVAL_IN_MS,
     });
 
