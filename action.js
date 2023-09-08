@@ -218,6 +218,7 @@ const waitForDeploymentToStart = async ({
         environment,
       });
 
+      console.log(JSON.stringify(deployments))
       const deployment =
         deployments.data.length > 0 && deployments.data[0]
         // deployments.data.find((deployment) => {
