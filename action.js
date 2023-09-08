@@ -219,10 +219,10 @@ const waitForDeploymentToStart = async ({
       });
 
       const deployment =
-        deployments.data.length > 0 &&
-        deployments.data.find((deployment) => {
-          return deployment.creator.login === actorName;
-        });
+        deployments.data.length > 0 // &&
+        // deployments.data.find((deployment) => {
+        //   return deployment.creator.login === actorName;
+        // });
 
       if (deployment) {
         return deployment;
