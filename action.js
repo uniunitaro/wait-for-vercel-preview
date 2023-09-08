@@ -230,7 +230,7 @@ const waitForDeploymentToStart = async ({
       }
 
       console.log(
-        `Could not find any deployments for actor ${actorName}, retrying (attempt ${
+        `OOPS! Could not find any deployments for actor ${actorName}, retrying (attempt ${
           i + 1
         } / ${iterations})`
       );
